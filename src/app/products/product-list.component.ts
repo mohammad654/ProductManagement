@@ -1,31 +1,57 @@
-import { Component } from "@angular/core";
-
+import { Component,OnInit ,OnDestroy} from "@angular/core";
+import { InProduct } from "./product";
+import {ProductService} from '../services/product.service';
+import { Subscription } from "rxjs";
 @Component({
   selector: 'pm-products',
-  templateUrl: './product-list.component.html'
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.css'],
+  providers: [ProductService]
+
 })
-export class ProductListComponent {
-  pageTitle: string = 'Product List';
-  products: any[] = [
-    {
-      "productId": 2,
-      "productName": "Garden Cart",
-      "productCode": "GDN-0023",
-      "releaseDate": "March 18, 2021",
-      "description": "15 gallon capacity rolling garden cart",
-      "price": 32.99,
-      "starRating": 4.2,
-      "imageUrl": "assets/images/garden_cart.png"
-    },
-    {
-      "productId": 5,
-      "productName": "Hammer",
-      "productCode": "TBX-0048",
-      "releaseDate": "May 21, 2021",
-      "description": "Curved claw steel hammer",
-      "price": 8.9,
-      "starRating": 4.8,
-      "imageUrl": "assets/images/hammer.png"
+export class ProductListComponent implements OnInit {
+    pageTitle: string = 'Product List';
+    imageWidth: number = 50;
+    imageMargin: number = 2;
+    showImage: boolean = false;
+    filteredProducts: InProduct[] = [];
+    products: InProduct[] =[]
+    private _listFilter:string='';
+     sub!: Subscription;
+     errorMessage: string = '';
+
+    get listFilter():string{ return this._listFilter;}
+
+    set listFilter(value:string){
+    this._listFilter=value;
+    this.filteredProducts=this.performFilter(value);
     }
-  ];
+
+performFilter(filterBy:string): InProduct[]{
+    filterBy=filterBy.toLocaleLowerCase();
+     return this.products.filter((product:InProduct)=>
+            product.productName.toLocaleLowerCase().includes(filterBy)
+          )
+}
+  toggleImage(): void {
+    this.showImage = !this.showImage;
+  }
+  onRatingClicked(message: string): void {
+    this.pageTitle = 'Product List: ' + message;
+  }
+   constructor(private productService: ProductService) { }
+
+  ngOnInit(): void{
+   this.listFilter='cart';
+      this.sub = this.productService.getProducts().subscribe({
+          next: products => {
+            this.products = products;
+            this.filteredProducts = this.products;
+          },
+          error: err => this.errorMessage = err
+        });
+  }
+    ngOnDestroy(): void {
+      this.sub.unsubscribe();
+    }
 }

@@ -1,0 +1,14 @@
+
+<div class='container-fluid'>
+  <h1 class="text-center">{{pageTitle}}</h1>
+  <nav class='navbar navbar-expand navbar-light bg-light'>
+    <a class='navbar-brand' routerLink='/welcome'>{{pageTitle}}</a>
+    <ul class='nav nav-pills'>
+      <li><a class='nav-link' routerLink='/welcome'>Home</a></li>
+      <li><a class='nav-link' routerLink='/products'>Product List</a></li>
+      <li><a class='nav-link' [routerLink]="['/products', 0, 'add']">add Product</a></li>
+      <li><a class='nav-link' [routerLink]="['/template']">Template</a></li>
+      <li><a class='nav-link' [routerLink]="['/reactive']">Reactive</a></li>
+    </ul>
+  </nav>
+</div>
